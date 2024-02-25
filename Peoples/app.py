@@ -4,7 +4,6 @@
 # 3. users.txt - Профиль(hint -> .simple_profile()), разделитель - запятая
 
 # Создать по 10 строк в каждом файле
-from random import choice
 from flask import Flask, render_template
 from faker import Faker
 

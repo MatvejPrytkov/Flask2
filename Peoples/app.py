@@ -4,6 +4,7 @@
 # 3. users.txt - Профиль(hint -> .simple_profile()), разделитель - запятая
 
 # Создать по 10 строк в каждом файле
+from random import choice
 from flask import Flask, render_template
 from faker import Faker
 
@@ -38,7 +39,7 @@ def get_names():
     with open("./files/names.txt", encoding="utf-8") as f:
         for raw_line in f:
             names.append(raw_line.strip())
-    return "<br>".join(names)
+    return render_template("names.html", people_names=names)
 
 
 if __name__ == "__main__":

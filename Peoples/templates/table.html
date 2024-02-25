@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Список пользователей {% endblock  %}
+
+{% block content %}
+<br><br>
+<table border="1" cellspacing="0">
+    <tr>
+        <th>Фамилия</th>
+        <th>Имя</th>
+        <th>Отчество</th>
+    </tr>
+
+    {% for people in peoples %}
+    <tr>
+        <td> {{ people.last_name }} </td>
+        <td> {{ people.first_name }} </td>
+        <td> {{ people.middle_name }} </td>
+    </tr>
+    {% endfor %}
+
+</table>
+{% endblock  %}

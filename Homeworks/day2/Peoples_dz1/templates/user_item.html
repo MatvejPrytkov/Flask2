@@ -1,0 +1,13 @@
+<!-- Файл table.html -->
+{% extends "base.html" %}
+
+{% block title %}Пользователь {{item.login}} {% endblock %}
+
+{% block content %}
+<br>
+Пользователь: <br>
+<p class="my_css"><strong> ФИО=</strong> {{item.fio}} </p>
+<p class="my_css"><strong> Пол=</strong> {{item.sex}} </p>
+<p class="my_css"><strong> Дата рождния=</strong> {{item.birthdate}} </p>
+<p class="my_css"><strong> Почта=</strong> {{item.mail}} </p>
+{% endblock %}

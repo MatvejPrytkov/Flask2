@@ -1,6 +1,8 @@
 from api import app, db
 from flask import request, abort, jsonify
 from api.models.author import AuthorModel
+from api.models.quote import QuoteModel
+from api.schemas.author import author_schema, authors_schema
 
 
 
@@ -9,10 +11,7 @@ from api.models.author import AuthorModel
 def handle_authors():
     if request.method == "GET":
         authors = AuthorModel.query.all()
-        authors_dict = []
-        for author in authors:
-            authors_dict.append(author.to_dict())
-        return jsonify(authors_dict), 200 
+        return authors_schema.dump(authors), 200
       
     if request.method == "POST":
         author_data = request.json

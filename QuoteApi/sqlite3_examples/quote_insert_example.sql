@@ -1,1 +1,0 @@
-INSERT INTO "quotes" ("id", "author", "text") VALUES (1,'Народная мудрость','Нет пламя без огня');

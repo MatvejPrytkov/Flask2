@@ -15,6 +15,7 @@ def get_quote_by_author(author_id):
         quotes_lst_dct.append(quote.to_dict())
     return jsonify(quotes_lst_dct), 200
 
+
 @app.route("/authors/<int:author_id>/quotes", methods=["POST"])
 def create_quote_to_author(author_id):
     """ function to create new quote to author"""
@@ -51,13 +52,14 @@ def get_quote_by_id(quote_id):
         return jsonify(quote.to_dict()), 200
     abort(404, f"Quote with id={quote_id} not found")
 
+
 @app.delete("/quotes/<int:quote_id>")
 def delete(quote_id):
     quote = db.session.get(QuoteModel, quote_id)
     if quote is not None:
         db.session.delete(quote)
         db.session.commit()
-        return jsonify(message=f"Row with id={quote_id} deleted."), 200
+        return jsonify(message=f"Quote with id={quote_id} deleted."), 200
     abort(404, f"Quote id = {quote_id} not found")
 
 

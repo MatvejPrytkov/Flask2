@@ -1,7 +1,7 @@
 from api import app, db
 from flask import request, abort, jsonify
 from api.models.author import AuthorModel
-from api.models.quote import QuoteModel
+from api.models.quote import QuoteModel  # noqa: F401
 from api.schemas.author import author_schema, authors_schema
 
 

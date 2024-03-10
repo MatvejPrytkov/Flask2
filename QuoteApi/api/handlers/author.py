@@ -14,12 +14,14 @@ def handle_authors():
         return authors_schema.dump(authors), 200
       
     if request.method == "POST":
-        author_data = request.json
+        # author_data = request.json # get_json(): json -> dict
+        author_data = author_schema.loads(request.data) # get_data: str 
+        
         author = AuthorModel(author_data.get("name", "Ivan"))
         db.session.add(author)
         try:
             db.session.commit()
-            return jsonify(author.to_dict()), 201
+            return jsonify(author_schema.dump(author)), 201
         except Exception:       
             abort(400, "UNIQUE constraint failed")
 
@@ -28,7 +30,7 @@ def handle_authors():
 def get_author(author_id):
     author = AuthorModel.query.get(author_id)
     if author:
-        return jsonify(author.to_dict()), 200
+        return jsonify(author_schema.dump(author)), 200
     abort(404, f"Author with id = {author_id} not found")
 
 
@@ -44,7 +46,7 @@ def edit_author(author_id):
         setattr(author, key, value)
     try:
         db.session.commit()
-        return jsonify(author.to_dict()), 200
+        return jsonify(author_schema.dump(author)), 200
     except Exception:
         abort(400, "Database commit operation failed.")
 

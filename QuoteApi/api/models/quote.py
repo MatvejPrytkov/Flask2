@@ -17,10 +17,10 @@ class QuoteModel(db.Model):
     def __repr__(self):
         return f'Quote({self.text})'
        
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "author": self.author_id,
-            "text": self.text,
-            "rating": self.rating
-        }
+    # def to_dict(self):
+    #     return {
+    #         "id": self.id,
+    #         "author": self.author_id,
+    #         "text": self.text,
+    #         "rating": self.rating
+    #     }

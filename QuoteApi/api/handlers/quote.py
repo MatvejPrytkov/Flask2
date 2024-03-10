@@ -2,6 +2,7 @@ from api import app, db
 from flask import request, abort, jsonify
 from api.models.quote import QuoteModel
 from api.models.author import AuthorModel
+from api.schemas.quote import quote_schema, quotes_schema
 from . import validate
 
 
@@ -10,16 +11,13 @@ from . import validate
 @app.get("/authors/<int:author_id>/quotes")
 def get_quote_by_author(author_id):
     quotes_lst = db.session.query(QuoteModel).filter_by(author_id=author_id)   
-    quotes_lst_dct = []
-    for quote in quotes_lst:
-        quotes_lst_dct.append(quote.to_dict())
-    return jsonify(quotes_lst_dct), 200
+    return jsonify(quotes_schema.dump(quotes_lst)), 200
 
 
 @app.route("/authors/<int:author_id>/quotes", methods=["POST"])
 def create_quote_to_author(author_id):
     """ function to create new quote to author"""
-    author = AuthorModel.query.get(author_id)
+    author = AuthorModel.query.get_or_404(author_id)
     data = request.json
     # Валидация данных
     data = validate(data)
@@ -29,7 +27,7 @@ def create_quote_to_author(author_id):
     db.session.add(new_quote)
     try:
         db.session.commit()
-        return new_quote.to_dict(), 201
+        return quote_schema.dump(new_quote), 201
     except Exception:
         abort(400, "Database commit operation failed.")
 
@@ -38,18 +36,14 @@ def create_quote_to_author(author_id):
 def get_quotes():
     """ Сериализация: list[quotes] -> list[dict] -> str(JSON) """
     quotes_db = QuoteModel.query.all()
-    quotes = []
-    for quote_db in quotes_db:
-        quotes.append(quote_db.to_dict())
-    
-    return jsonify(quotes), 200
+    return jsonify(quotes_schema.dump(quotes_db)), 200
 
 
 @app.get("/quotes/<int:quote_id>")
 def get_quote_by_id(quote_id):
     quote = QuoteModel.query.get(quote_id)
     if quote:
-        return jsonify(quote.to_dict()), 200
+        return jsonify(quote_schema.dump(quote)), 200
     abort(404, f"Quote with id={quote_id} not found")
 
 
@@ -79,7 +73,7 @@ def edit_quote(quote_id):
 
     try:
         db.session.commit()
-        return jsonify(quote.to_dict()), 200
+        return jsonify(quote_schema.dump(quote)), 200
     except Exception:
         abort(500)
 
@@ -91,9 +85,6 @@ def get_quotes_by_filter():
     # Универсальное решение  
     quotes_db = QuoteModel.query.filter_by(**kwargs).all()
 
-    if quotes_db:
-        quotes = []
-        for quote in quotes_db:
-            quotes.append(quote.to_dict())      
-        return jsonify(quotes), 200
+    if quotes_db:   
+        return jsonify(quotes_schema.dump(quotes_db)), 200
     return jsonify([]), 200

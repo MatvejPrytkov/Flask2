@@ -12,6 +12,8 @@ flask-sqlalchemy = "*"
 flask-migrate = "*"
 flask-marshmallow = "*"
 marshmallow-sqlalchemy = "*"
+flask-httpauth = "*"
+passlib = "*"
 
 [dev-packages]
 ruff = "*"

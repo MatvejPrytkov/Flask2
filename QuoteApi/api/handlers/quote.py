@@ -2,39 +2,46 @@ from api import app, db
 from flask import request, abort, jsonify
 from api.models.quote import QuoteModel
 from api.models.author import AuthorModel
-from api.schemas.quote import quote_schema, quotes_schema
+from api.schemas.quote import quote_schema, quotes_schema, quote_rating_schema
 from . import validate
-
+from marshmallow import ValidationError
 
 
 # GET на url: /authors/<int:id>/quotes      # получить все цитаты автора с quote_id = <int:quote_id>
 @app.get("/authors/<int:author_id>/quotes")
 def get_quote_by_author(author_id):
-    quotes_lst = db.session.query(QuoteModel).filter_by(author_id=author_id)   
+    quotes_lst = db.session.query(QuoteModel).filter_by(author_id=author_id)
     return jsonify(quotes_schema.dump(quotes_lst)), 200
 
 
 @app.route("/authors/<int:author_id>/quotes", methods=["POST"])
 def create_quote_to_author(author_id):
-    """ function to create new quote to author"""
+    """function to create new quote to author"""
     author = AuthorModel.query.get_or_404(author_id)
-    data = request.json
+    try:
+        data = quote_rating_schema.loads(request.data)
+    except ValidationError:
+        data = quote_schema.loads(request.data)
+        data["rating"] = 1
+
     # Валидация данных
-    data = validate(data)
+    # data = validate(data)
 
     # После валидации создаем новую цитату
     new_quote = QuoteModel(author, **data)
     db.session.add(new_quote)
     try:
         db.session.commit()
-        return quote_schema.dump(new_quote), 201
+        out_data = quote_rating_schema.dump(new_quote)
+        print(f'{out_data = }')
+        return quote_rating_schema.dump(new_quote), 201
     except Exception:
         abort(400, "Database commit operation failed.")
 
 
 @app.route("/quotes")
 def get_quotes():
-    """ Сериализация: list[quotes] -> list[dict] -> str(JSON) """
+    """Сериализация: list[quotes] -> list[dict] -> str(JSON)"""
     quotes_db = QuoteModel.query.all()
     return jsonify(quotes_schema.dump(quotes_db)), 200
 
@@ -66,7 +73,7 @@ def edit_quote(quote_id):
 
     # Валидация данных
     data = validate(data, "put")
-        
+
     # Универсальный случай
     for key, value in data.items():
         setattr(quote, key, value)
@@ -82,9 +89,9 @@ def edit_quote(quote_id):
 def get_quotes_by_filter():
     kwargs = request.args
 
-    # Универсальное решение  
+    # Универсальное решение
     quotes_db = QuoteModel.query.filter_by(**kwargs).all()
 
-    if quotes_db:   
+    if quotes_db:
         return jsonify(quotes_schema.dump(quotes_db)), 200
     return jsonify([]), 200

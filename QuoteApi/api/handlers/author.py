@@ -14,8 +14,8 @@ def handle_authors():
         return authors_schema.dump(authors), 200
       
     if request.method == "POST":
-        # author_data = request.json # get_json(): json -> dict
-        author_data = author_schema.loads(request.data) # get_data: str 
+        author_data = author_schema.load(request.json) # get_json(): json -> dict
+        # author_data = author_schema.loads(request.data) # get_data: binary str -> dict
         
         author = AuthorModel(author_data.get("name", "Ivan"))
         db.session.add(author)

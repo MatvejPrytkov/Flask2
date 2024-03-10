@@ -3,7 +3,6 @@ from flask import request, abort, jsonify
 from api.models.quote import QuoteModel
 from api.models.author import AuthorModel
 from api.schemas.quote import quote_schema, quotes_schema, quote_rating_schema
-from . import validate
 from marshmallow import ValidationError
 
 
@@ -24,9 +23,6 @@ def create_quote_to_author(author_id):
         data = quote_schema.loads(request.data)
         data["rating"] = 1
 
-    # Валидация данных
-    # data = validate(data)
-
     # После валидации создаем новую цитату
     new_quote = QuoteModel(author, **data)
     db.session.add(new_quote)
@@ -43,14 +39,14 @@ def create_quote_to_author(author_id):
 def get_quotes():
     """Сериализация: list[quotes] -> list[dict] -> str(JSON)"""
     quotes_db = QuoteModel.query.all()
-    return jsonify(quotes_schema.dump(quotes_db)), 200
+    return jsonify(quote_rating_schema.dump(quotes_db, many=True)), 200
 
 
 @app.get("/quotes/<int:quote_id>")
 def get_quote_by_id(quote_id):
     quote = QuoteModel.query.get(quote_id)
     if quote:
-        return jsonify(quote_schema.dump(quote)), 200
+        return jsonify(quote_rating_schema.dump(quote)), 200
     abort(404, f"Quote with id={quote_id} not found")
 
 
@@ -66,13 +62,12 @@ def delete(quote_id):
 
 @app.put("/quotes/<int:quote_id>")
 def edit_quote(quote_id):
-    data = request.json
-    quote = QuoteModel.query.get(quote_id)
-    if not quote:
-        abort(404, f"Quote id = {quote_id} not found")
+    quote = QuoteModel.query.get_or_404(quote_id, f"Quote id = {quote_id} not found")
 
-    # Валидация данных
-    data = validate(data, "put")
+    try:
+        data = quote_rating_schema.loads(request.data)
+    except ValidationError:
+        data = quote_schema.loads(request.data)
 
     # Универсальный случай
     for key, value in data.items():
@@ -80,7 +75,7 @@ def edit_quote(quote_id):
 
     try:
         db.session.commit()
-        return jsonify(quote_schema.dump(quote)), 200
+        return jsonify(quote_rating_schema.dump(quote)), 200
     except Exception:
         abort(500)
 

@@ -12,6 +12,9 @@ class UserModel(db.Model):
         self.username = username
         self.hash_password(password)
 
+    def __repr__(self):
+        return f'User({self.username})'
+    
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)
 

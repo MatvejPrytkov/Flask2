@@ -24,14 +24,42 @@ def get_users():
 def create_user():
     if request.method == "POST":
         try:
-            user_data = user_schema.load(request.json)
+            user = user_schema.load(request.json)
         except ValidationError as error:
             return jsonify(error.messages)
-        
-    user = UserModel(**user_data)
+
     db.session.add(user)
     try:
         db.session.commit()
         return jsonify(user_schema.dump(user)), 201
     except Exception:
         abort(400, "unique contraint failed.")
+
+
+@app.put("/users/<int:user_id>")
+def change_user(user_id):
+    user = UserModel.query.get_or_404(user_id, f"User with id = {user_id} not found")
+
+    try:
+        user_data = user_schema.load(request.json)
+    except ValidationError as error:
+        return jsonify(error.messages)
+    
+    for key, value in user_data.items():
+        setattr(user, key, value)
+    try:
+        db.session.commit()
+        return jsonify(user_schema.dump(user)), 200
+    except Exception:
+        abort(400, "Database commit operation failed.")
+
+
+@app.delete("/users/<int:user_id>")
+def delete_user(user_id):
+    user = UserModel.query.get_or_404(user_id, f"User with id = {user_id} not found")
+    db.session.delete(user)
+    try:
+        db.session.commit()
+        return jsonify(message=f"User with id={user_id} deleted successfully"), 200
+    except Exception:
+        abort(400, "Database commit operation failed.")

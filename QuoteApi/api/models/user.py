@@ -29,7 +29,7 @@ class UserModel(db.Model):
     #    s = URLSafeSerializer(Config.SECRET_KEY)
     #    return s.dumps({'id': self.id})
         token = jwt.encode({"id": self.id, "exp": int(time() + 3600)},
-                           app.config["SECRET_KEY"], algorithm="HS256")
+                           Config.SECRET_KEY, algorithm="HS256")
         return token
 
     @staticmethod

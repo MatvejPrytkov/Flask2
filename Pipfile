@@ -15,6 +15,7 @@ marshmallow-sqlalchemy = "*"
 flask-httpauth = "*"
 passlib = "*"
 pyjwt = "*"
+flask-wtf = "*"
 
 [dev-packages]
 ruff = "*"

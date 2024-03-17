@@ -14,3 +14,4 @@ ma = Marshmallow(app)
 
 from api.handlers import author  # noqa: E402, F401
 from api.handlers import quote  # noqa: E402, F401
+from api.handlers import user  # noqa: E402, F401

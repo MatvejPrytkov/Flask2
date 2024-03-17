@@ -1,7 +1,9 @@
 from passlib.apps import custom_app_context as pwd_context
 from api import app, db, Config
-from itsdangerous import URLSafeSerializer
-from itsdangerous import BadSignature
+# from itsdangerous import URLSafeSerializer
+# from itsdangerous import BadSignature
+import jwt
+from time import time
 
 
 class UserModel(db.Model):
@@ -24,15 +26,21 @@ class UserModel(db.Model):
         return pwd_context.verify(password, self.password_hash)
     
     def generate_auth_token(self):
-       s = URLSafeSerializer(Config.SECRET_KEY)
-       return s.dumps({'id': self.id})
+    #    s = URLSafeSerializer(Config.SECRET_KEY)
+    #    return s.dumps({'id': self.id})
+        token = jwt.encode({"id": self.id, "exp": int(time() + 3600)},
+                           app.config["SECRET_KEY"], algorithm="HS256")
+        return token
 
     @staticmethod
     def verify_auth_token(token):
-        s = URLSafeSerializer(Config.SECRET_KEY)
+        # s = URLSafeSerializer(app.config["SECRET_KEY"])
+        # try:
+        #     data = s.loads(token)
+        # except BadSignature:
         try:
-            data = s.loads(token)
-        except BadSignature:
+            data = jwt.decode(token, app.config["SECRET_KEY"], algorithms=["HS256"])
+        except Exception:
             return None  # invalid token
         user = UserModel.query.get(data['id'])
         return user

@@ -9,7 +9,7 @@ class QuoteModel(db.Model):
     text = db.Column(db.String(255), unique=False, nullable=False)
     rating = db.Column(db.Integer, unique=False, nullable=False, default="1", server_default="3")
 
-    def __init__(self, author, text, rating):
+    def __init__(self, author, text, rating=1):
         self.author_id = author.id
         self.text  = text
         self.rating = rating
@@ -17,10 +17,3 @@ class QuoteModel(db.Model):
     def __repr__(self):
         return f'Quote({self.text})'
     
-    # def to_dict(self):
-    #     return {
-    #         "id": self.id,
-    #         "author": self.author_id,
-    #         "text": self.text,
-    #         "rating": self.rating
-    #     }

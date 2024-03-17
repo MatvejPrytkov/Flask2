@@ -5,8 +5,7 @@ from api.schemas.author import AuthorSchema
 
 
 def rating_validate(value: int):
-    if value > 5:
-        ValidationError("Rating field out of range.")
+    return value in range(1, 6) # if False -> raise ValidationError
 
 
 
@@ -18,12 +17,9 @@ class QuoteSchema(ma.SQLAlchemySchema):
     id = ma.auto_field()
     text = ma.auto_field()
     author = ma.Nested(AuthorSchema())
+    rating = fields.Integer(strict=True, validate=rating_validate)
 
 
-class QuoteRatingSchema(QuoteSchema):
-    rating = fields.Integer(strict=True, validate=validate.Range(min=1, max=5))
-
-
-quote_schema = QuoteSchema()
-quote_rating_schema = QuoteRatingSchema()
+quote_schema = QuoteSchema(exclude=["rating"])
+quote_rating_schema = QuoteSchema()
 quotes_schema = QuoteSchema(many=True)

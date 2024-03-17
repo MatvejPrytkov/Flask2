@@ -21,15 +21,12 @@ def create_quote_to_author(author_id):
         data = quote_rating_schema.loads(request.data)
     except ValidationError:
         data = quote_schema.loads(request.data)
-        data["rating"] = 1
 
     # После валидации создаем новую цитату
     new_quote = QuoteModel(author, **data)
     db.session.add(new_quote)
     try:
         db.session.commit()
-        out_data = quote_rating_schema.dump(new_quote)
-        print(f'{out_data = }')
         return quote_rating_schema.dump(new_quote), 201
     except Exception:
         abort(400, "Database commit operation failed.")

@@ -18,7 +18,7 @@ def handle_authors():
         author_data = author_schema.load(request.json) # get_json(): json -> dict
         # author_data = author_schema.loads(request.data) # get_data: binary str -> dict
         
-        author = AuthorModel(author_data.get("name", "Ivan"))
+        author = AuthorModel(**author_data)
         db.session.add(author)
         try:
             db.session.commit()
@@ -36,6 +36,7 @@ def get_author(author_id):
 
 
 @app.put("/authors/<int:author_id>")
+@auth.login_required
 def edit_author(author_id):
     new_data = request.json
     author = AuthorModel.query.get(author_id)
@@ -53,6 +54,7 @@ def edit_author(author_id):
 
 
 @app.delete("/authors/<int:author_id>")
+@auth.login_required
 def delete_author(author_id):
     author = AuthorModel.query.get(author_id)
     if not author:

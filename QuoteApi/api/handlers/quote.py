@@ -14,6 +14,7 @@ def get_quote_by_author(author_id):
 
 
 @app.route("/authors/<int:author_id>/quotes", methods=["POST"])
+@auth.login_required
 def create_quote_to_author(author_id):
     """function to create new quote to author"""
     author = AuthorModel.query.get_or_404(author_id)
@@ -33,7 +34,6 @@ def create_quote_to_author(author_id):
 
 
 @app.route("/quotes")
-@auth.login_required
 def get_quotes():
     """Сериализация: list[quotes] -> list[dict] -> str(JSON)"""
     current_user = auth.current_user()
@@ -61,6 +61,7 @@ def delete(quote_id):
 
 
 @app.put("/quotes/<int:quote_id>")
+@auth.login_required
 def edit_quote(quote_id):
     quote = QuoteModel.query.get_or_404(quote_id, f"Quote id = {quote_id} not found")
 

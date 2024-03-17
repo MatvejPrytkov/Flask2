@@ -39,3 +39,6 @@ from api.handlers import author  # noqa: E402, F401
 from api.handlers import quote   # noqa: E402, F401
 from api.handlers import user    # noqa: E402, F401
 from api.handlers import token   # noqa: E402, F401
+
+from api.auth.views import auth as bp_auth  # noqa: E402, F401
+app.register_blueprint(bp_auth)

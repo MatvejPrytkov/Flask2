@@ -1,6 +1,7 @@
 from api import app, db
 from api.models.user import UserModel
 from api.schemas.user import user_schema, users_schema
+from flask import request, jsonify
 
 
 # url: /users/<int:user_id>

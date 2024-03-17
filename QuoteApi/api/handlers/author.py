@@ -1,4 +1,4 @@
-from api import app, db
+from api import app, db, auth
 from flask import request, abort, jsonify
 from api.models.author import AuthorModel
 from api.models.quote import QuoteModel  # noqa: F401
@@ -8,6 +8,7 @@ from api.schemas.author import author_schema, authors_schema
 
 
 @app.route("/authors", methods=["GET", "POST"])
+@auth.login_required
 def handle_authors():
     if request.method == "GET":
         authors = AuthorModel.query.all()

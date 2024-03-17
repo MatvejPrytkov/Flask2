@@ -1,4 +1,4 @@
-from api import app, db
+from api import app, db, auth
 from flask import request, abort, jsonify
 from api.models.quote import QuoteModel
 from api.models.author import AuthorModel
@@ -33,8 +33,11 @@ def create_quote_to_author(author_id):
 
 
 @app.route("/quotes")
+@auth.login_required
 def get_quotes():
     """Сериализация: list[quotes] -> list[dict] -> str(JSON)"""
+    current_user = auth.current_user()
+    print(f'{current_user = }')
     quotes_db = QuoteModel.query.all()
     return jsonify(quote_rating_schema.dump(quotes_db, many=True)), 200
 

@@ -1,9 +1,10 @@
-from api import app, db, auth
-from flask import request, abort, jsonify
-from api.models.quote import QuoteModel
-from api.models.author import AuthorModel
-from api.schemas.quote import quote_schema, quotes_schema, quote_rating_schema
+from flask import abort, jsonify, request
 from marshmallow import ValidationError
+
+from api import app, multi_auth, db
+from api.models.author import AuthorModel
+from api.models.quote import QuoteModel
+from api.schemas.quote import quote_rating_schema, quote_schema, quotes_schema
 
 
 # GET на url: /authors/<int:id>/quotes      # получить все цитаты автора с quote_id = <int:quote_id>
@@ -14,7 +15,7 @@ def get_quote_by_author(author_id):
 
 
 @app.route("/authors/<int:author_id>/quotes", methods=["POST"])
-@auth.login_required
+@multi_auth.login_required
 def create_quote_to_author(author_id):
     """function to create new quote to author"""
     author = AuthorModel.query.get_or_404(author_id)
@@ -36,8 +37,8 @@ def create_quote_to_author(author_id):
 @app.route("/quotes")
 def get_quotes():
     """Сериализация: list[quotes] -> list[dict] -> str(JSON)"""
-    current_user = auth.current_user()
-    print(f'{current_user = }')
+    current_user = multi_auth.current_user()
+    print(f"{current_user = }")
     quotes_db = QuoteModel.query.all()
     return jsonify(quote_rating_schema.dump(quotes_db, many=True)), 200
 
@@ -61,7 +62,7 @@ def delete(quote_id):
 
 
 @app.put("/quotes/<int:quote_id>")
-@auth.login_required
+@multi_auth.login_required
 def edit_quote(quote_id):
     quote = QuoteModel.query.get_or_404(quote_id, f"Quote id = {quote_id} not found")
 

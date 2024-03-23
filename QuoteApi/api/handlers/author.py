@@ -6,14 +6,15 @@ from api.models.quote import QuoteModel  # noqa: F401
 from api.schemas.author import author_schema, authors_schema
 
 
-@app.route("/authors", methods=["GET", "POST"])
+@app.route("/authors")
 @multi_auth.login_required
 def handle_authors():
-    if request.method == "GET":
         authors = AuthorModel.query.all()
         return authors_schema.dump(authors), 200
 
-    if request.method == "POST":
+@app.post("/authors")
+@multi_auth.login_required(role='admin')    
+def handle_authors_post():
         author_data = author_schema.load(request.json)  # get_json(): json -> dict
         # author_data = author_schema.loads(request.data) # get_data: binary str -> dict
 
